@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صانع صفحات الهبوط بالذكاء الاصطناعي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #8b5cf6;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        /* Main Card */
+        .main-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            padding: 40px;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5em;
+            color: white;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 0.95em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1em;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .upload-area {
+            border: 3px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8fafc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: #f1f5f9;
+        }
+
+        .upload-area.has-image {
+            border-color: var(--success);
+            background: #ecfdf5;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+
+        .upload-area.has-image .upload-icon {
+            color: var(--success);
+        }
+
+        .upload-text {
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        .upload-hint {
+            font-size: 0.85em;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .preview-image.show {
+            display: block;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #e2e8f0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        .loading-steps {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .step {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+
+        .step.active {
+            opacity: 1;
+            background: #f1f5f9;
+        }
+
+        .step.completed {
+            opacity: 1;
+            color: var(--success);
+        }
+
+        /* Result Section */
+        .result {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--success), #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 3em;
+            color: white;
+            animation: scaleIn 0.5s;
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .link-box {
+            background: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .link-input {
+            flex: 1;
+            background: white;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9em;
+            direction: ltr;
+        }
+
+        .copy-btn {
+            padding: 12px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+        }
+
+        .preview-btn {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        /* Landing Page Preview Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 900px;
+            margin: 50px auto;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            z-index: 10;
+        }
+
+        .landing-preview {
+            padding: 0;
+        }
+
+        /* Generated Landing Page Styles */
+        .generated-landing {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        .hero-image {
+            max-width: 400px;
+            margin: 30px auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .features-section {
+            padding: 60px 40px;
+            background: #f8fafc;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .cta-section {
+            padding: 60px 40px;
+            text-align: center;
+            background: white;
+        }
+
+        .price-tag {
+            font-size: 3em;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        .order-form {
+            max-width: 500px;
+            margin: 40px auto;
+            text-align: right;
+        }
+
+        .order-form input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: inherit;
+        }
+
+        .order-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--secondary), #db2777);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .order-btn:hover {
+            transform: scale(1.02);
+        }
+
+        /* Orders Dashboard */
+        .dashboard {
+            display: none;
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            margin-top: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+
+        .dashboard.show {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .dashboard-title {
+            font-size: 1.8em;
+            font-weight: 800;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .orders-table th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: var(--gray);
+        }
+
+        .orders-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-new {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-contacted {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+
+        .action-btn.view {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .action-btn.complete {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--gray);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #f1f5f9;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--dark);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 2000;
+            animation: slideIn 0.3s;
+        }
+
+        .toast.show {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .main-card {
+                padding: 25px;
+            }
+            
+            .hero-title {
+                font-size: 1.8em;
+            }
+            
+            .modal-content {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* API Key Section */
+        .api-section {
+            background: #f0f9ff;
+            border: 2px solid #bae6fd;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .api-section label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #0369a1;
+        }
+
+        .api-input-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .info-text {
+            font-size: 0.85em;
+            color: var(--gray);
+            margin-top: 8px;
+        }
+
+        .info-text a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Gallery */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .landing-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .landing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .landing-card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .landing-card-content {
+            padding: 20px;
+        }
+
+        .landing-card-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .landing-card-date {
+            font-size: 0.85em;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .landing-card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .generated-images {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .generated-image {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚀 صانع صفحات الهبوط الذكي</h1>
+            <p>حوّل منتجاتك إلى صفحات هبوط احترافية بالذكاء الاصطناعي في ثوانٍ</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-tabs" id="mainNav">
+            <button class="nav-tab active" onclick="showTab('creator')">
+                <i class="fas fa-magic"></i> إنشاء صفحة جديدة
+            </button>
+            <button class="nav-tab" onclick="showTab('landings')">
+                <i class="fas fa-layer-group"></i> صفحاتي
+            </button>
+            <button class="nav-tab" onclick="showTab('orders')">
+                <i class="fas fa-shopping-cart"></i> الطلبات
+                <span id="ordersBadge" class="badge badge-new" style="display:none">0</span>
+            </button>
+        </div>
+
+        <!-- Creator Tab -->
+        <div id="creatorTab" class="tab-content">
+            <div class="main-card">
+                <div class="logo-icon">
+                    <i class="fas fa-sparkles"></i>
+                </div>
+                
+                <h2 style="text-align: center; margin-bottom: 10px;">صمم صفحة هبوطك</h2>
+                <p style="text-align: center; color: var(--gray); margin-bottom: 30px;">
+                    أدخل تفاصيل منتجك وسنقوم بإنشاء صفحة احترافية لك
+                </p>
+
+                <!-- API Key Input -->
+                <div class="api-section">
+                    <label>
+                        <i class="fas fa-key"></i>
+                        Gemini API Key
+                    </label>
+                    <div class="api-input-wrapper">
+                        <input type="password" id="apiKey" class="form-input" placeholder="أدخل مفتاح Gemini API الخاص بك" style="padding-left: 40px;">
+                        <button class="toggle-password" onclick="toggleApiKey()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <p class="info-text">
+                        <i class="fas fa-info-circle"></i>
+                        احصل على مفتاح API مجاني من 
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>
+                    </p>
+                </div>
+
+                <form id="landingForm">
+                    <!-- Image Upload -->
+                    <div class="form-group">
+                        <label class="form-label">صورة المنتج</label>
+                        <div class="upload-area" id="uploadArea" onclick="document.getElementById('productImage').click()">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">ارفع صورة المنتج</div>
+                            <div class="upload-hint">سيتم تحليل المنتج وكتابة المحتوى تلقائياً</div>
+                            <img id="previewImage" class="preview-image" alt="Preview">
+                        </div>
+                        <input type="file" id="productImage" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                    </div>
+
+                    <!-- Product Name -->
+                    <div class="form-group">
+                        <label class="form-label">اسم المنتج</label>
+                        <input type="text" id="productName" class="form-input" placeholder="مثال: سماعة الرأس العازلة للضجيج" required>
+                    </div>
+
+                    <!-- Product Description -->
+                    <div class="form-group">
+                        <label class="form-label">وصف قصير (اختياري)</label>
+                        <textarea id="productDesc" class="form-input" rows="3" placeholder="معلومات إضافية عن المنتج تساعد في التصميم..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="generateBtn">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        ابدأ التصميم الآن ✨
+                    </button>
+                </form>
+
+                <!-- Loading Section -->
+                <div class="loading" id="loadingSection">
+                    <div class="spinner"></div>
+                    <div class="loading-text">جاري إنشاء صفحة الهبوط...</div>
+                    <div class="loading-steps">
+                        <div class="step" id="step1">
+                            <i class="fas fa-image"></i>
+                            <span>تحليل صورة المنتج</span>
+                        </div>
+                        <div class="step" id="step2">
+                            <i class="fas fa-pen-fancy"></i>
+                            <span>توليد المحتوى التسويقي</span>
+                        </div>
+                        <div class="step" id="step3">
+                            <i class="fas fa-paint-brush"></i>
+                            <span>تصميم الصفحة</span>
+                        </div>
+                        <div class="step" id="step4">
+                            <i class="fas fa-check"></i>
+                            <span>الانتهاء</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Section -->
+                <div class="result" id="resultSection">
+                    <div class="success-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h3 style="text-align: center; margin-bottom: 10px;">تم إنشاء الصفحة بنجاح! 🎉</h3>
+                    <p style="text-align: center; color: var(--gray); margin-bottom: 20px;">
+                        صفحة الهبوط جاهزة للنشر
+                    </p>
+
+                    <div class="link-box">
+                        <input type="text" id="pageLink" class="link-input" readonly>
+                        <button class="copy-btn" onclick="copyLink()">
+                            <i class="fas fa-copy"></i> نسخ
+                        </button>
+                    </div>
+
+                    <button class="btn btn-secondary preview-btn" onclick="previewLanding()">
+                        <i class="fas fa-eye"></i> معاينة الصفحة
+                    </button>
+
+                    <button class="btn btn-primary" style="margin-top: 10px;" onclick="resetForm()">
+                        <i class="fas fa-plus"></i> إنشاء صفحة جديدة
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Landings Tab -->
+        <div id="landingsTab" class="tab-content hidden">
+            <div class="main-card">
+                <h2 style="margin-bottom: 20px;">📄 صفحات الهبوط المنشأة</h2>
+                <div id="landingsList" class="gallery">
+                    <!-- Landings will be loaded here -->
+                </div>
+                <div id="noLandings" class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h3>لا توجد صفحات بعد</h3>
+                    <p>ابدأ بإنشاء أول صفحة هبوط لك!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="ordersTab" class="tab-content hidden">
+            <div class="dashboard" style="display: block;">
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title">🛒 إدارة الطلبات</h2>
+                    <button class="btn btn-secondary" onclick="exportOrders()" style="width: auto; padding: 12px 24px;">
+                        <i class="fas fa-download"></i> تصدير Excel
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalOrders">0</div>
+                        <div class="stat-label">إجمالي الطلبات</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="newOrders">0</div>
+                        <div class="stat-label">طلبات جديدة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="completedOrders">0</div>
+                        <div class="stat-label">مكتملة</div>
+                    </div>
+                </div>
+
+                <div id="ordersList">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>المنتج</th>
+                                <th>العميل</th>
+                                <th>رقم الهاتف</th>
+                                <th>التاريخ</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <!-- Orders will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="noOrders" class="empty-state">
+                    <div class="empty-icon">🛍️</div>
+                    <h3>لا توجد طلبات بعد</h3>
+                    <p>ستظهر هنا طلبات العملاء من صفحات الهبوط</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="landing-preview" id="landingPreview">
+                <!-- Generated landing page will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">تم بنجاح!</span>
+    </div>
+
+    <script>
+        // Data Storage
+        let landings = JSON.parse(localStorage.getItem('landings') || '[]');
+        let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        let currentLanding = null;
+        let uploadedImageBase64 = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateOrdersBadge();
+            loadLandings();
+        });
+
+        // Tab Navigation
+        function showTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tab + 'Tab').classList.remove('hidden');
+            event.target.classList.add('active');
+            
+            if (tab === 'orders') loadOrders();
+            if (tab === 'landings') loadLandings();
+        }
+
+        // API Key Toggle
+        function toggleApiKey() {
+            const input = document.getElementById('apiKey');
+            const icon = event.currentTarget.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Image Upload
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImageBase64 = e.target.result;
+                const preview = document.getElementById('previewImage');
+                preview.src = uploadedImageBase64;
+                preview.classList.add('show');
+                document.getElementById('uploadArea').classList.add('has-image');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Form Submit
+        document.getElementById('landingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                showToast('يرجى إدخال Gemini API Key', 'error');
+                return;
+            }
+            
+            if (!uploadedImageBase64) {
+                showToast('يرجى رفع صورة المنتج', 'error');
+                return;
+            }
+            
+            const productName = document.getElementById('productName').value;
+            const productDesc = document.getElementById('productDesc').value;
+            
+            // Show loading
+            document.getElementById('landingForm').style.display = 'none';
+            document.getElementById('loadingSection').classList.add('show');
+            
+            try {
+                // Step 1: Analyze Image
+                updateStep(1, 'active');
+                await simulateDelay(1500);
+                
+                // Step 2: Generate Content
+                updateStep(1, 'completed');
+                updateStep(2, 'active');
+                const generatedContent = await generateContent(apiKey, productName, productDesc, uploadedImageBase64);
+                
+                // Step 3: Design Page
+                updateStep(2, 'completed');
+                updateStep(3, 'active');
+                await simulateDelay(1000);
+                
+                // Create Landing Page
+                const landingId = 'landing_' + Date.now();
+                const landingData = {
+                    id: landingId,
+                    productName: productName,
+                    productImage: uploadedImageBase64,
+                    content: generatedContent,
+                    createdAt: new Date().toISOString(),
+                    url: window.location.origin + window.location.pathname + '?landing=' + landingId
+                };
+                
+                // Save to localStorage
+                landings.unshift(landingData);
+                localStorage.setItem('landings', JSON.stringify(landings));
+                currentLanding = landingData;
+                
+                updateStep(3, 'completed');
+                updateStep(4, 'active');
+                await simulateDelay(500);
+                
+                // Show Result
+                document.getElementById('loadingSection').classList.remove('show');
+                document.getElementById('resultSection').classList.add('show');
+                document.getElementById('pageLink').value = landingData.url;
+                
+            } catch (error) {
+                console.error(error);
+                showToast('حدث خطأ: ' + error.message, 'error');
+                document.getElementById('loadingSection').classList.remove('show');
+                document.getElementById('landingForm').style.display = 'block';
+            }
+        });
+
+        // Generate Content with Gemini API
+        async function generateContent(apiKey, productName, productDesc, imageBase64) {
+            const prompt = `أنت خبير تسويقي محترف. قم بإنشاء محتوى تسويقي احترافي باللغة العربية لمنتج بعنوان "${productName}".
+            
+            ${productDesc ? 'معلومات إضافية: ' + productDesc : ''}
+            
+            قم بإنشاء:
+            1. عنوان رئيسي جذاب (headline)
+            2. وصف تسويقي مقنع (3-4 فقرات)
+            3. 3 مميزات رئيسية للمنتج مع أيقونات Font Awesome مناسبة
+            4. سعر مقترح (رقم عشوائي بين 100-1000 ريال)
+            5. عبارة تحفيزية للشراء (CTA)
+            6. عنوان فرعي (subtitle)
+            
+            أعد الرد بتنسيق JSON فقط بهذا الشكل:
+            {
+                "headline": "...",
+                "subtitle": "...",
+                "description": "...",
+                "features": [
+                    {"icon": "fa-icon-name", "title": "...", "desc": "..."},
+                    ...
+                ],
+                "price": "...",
+                "cta": "..."
+            }`;
+            
+            try {
+                // Convert base64 to blob for API
+                const base64Data = imageBase64.split(',')[1];
+                
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: prompt },
+                                {
+                                    inline_data: {
+                                        mime_type: "image/jpeg",
+                                        data: base64Data
+                                    }
+                                }
+                            ]
+                        }]
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error?.message || 'فشل في الاتصال بـ API');
+                }
+                
+                const data = await response.json();
+                const text = data.candidates[0].content.parts[0].text;
+                
+                // Extract JSON from response
+                const jsonMatch = text.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    return JSON.parse(jsonMatch[0]);
+                } else {
+                    // Fallback content if JSON parsing fails
+                    return getFallbackContent(productName);
+                }
+                
+            } catch (error) {
+                console.warn('API Error, using fallback:', error);
+                return getFallbackContent(productName);
+            }
+        }
+
+        // Fallback Content Generator
+        function getFallbackContent(productName) {
+            return {
+                headline: `اكتشف ${productName} - المستقبل بين يديك`,
+                subtitle: "تجربة فريدة من نوعها مع أحدث التقنيات",
+                description: `يقدم لك ${productName} تجربة استخدام استثنائية تجمع بين الأناقة والأداء العالي. صمم خصيصاً ليناسب احتياجاتك اليومية ويوفر لك الراحة التي تستحقها.\n\nمع مواصفات تقنية متطورة وتصميم عصري، يعد هذا المنتج الخيار الأمثل لكل من يبحث عن الجودة والتميز. لا تفوت الفرصة واحصل عليه الآن بسعر حصري!`,
+                features: [
+                    { icon: "fa-star", title: "جودة عالية", desc: "مصنوع من أفضل المواد لضمان المتانة" },
+                    { icon: "fa-shipping-fast", title: "توصيل سريع", desc: "نوصل لك أينما كنت في أسرع وقت" },
+                    { icon: "fa-shield-alt", title: "ضمان شامل", desc: "ضمان لمدة سنة على جميع العيوب" }
+                ],
+                price: Math.floor(Math.random() * 900 + 100) + " ريال",
+                cta: "اطلب الآن - الكمية محدودة!"
+            };
+        }
+
+        // Update Loading Steps
+        function updateStep(stepNum, status) {
+            const step = document.getElementById(`step${stepNum}`);
+            step.className = 'step ' + status;
+        }
+
+        // Simulate Delay
+        function simulateDelay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Copy Link
+        function copyLink() {
+            const input = document.getElementById('pageLink');
+            input.select();
+            document.execCommand('copy');
+            
+            const btn = document.querySelector('.copy-btn');
+            btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
+            btn.classList.add('copied');
+            
+            showToast('تم نسخ الرابط!');
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-copy"></i> نسخ';
+                btn.classList.remove('copied');
+            }, 2000);
+        }
+
+        // Preview Landing Page
+        function previewLanding() {
+            if (!currentLanding) return;
+            
+            const html = generateLandingHTML(currentLanding);
+            document.getElementById('landingPreview').innerHTML = html;
+            document.getElementById('previewModal').classList.add('show');
+        }
+
+        // Generate Landing Page HTML
+        function generateLandingHTML(landing) {
+            const content = landing.content;
+            const features = content.features.map(f => `
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas ${f.icon}"></i>
+                    </div>
+                    <h3>${f.title}</h3>
+                    <p>${f.desc}</p>
+                </div>
+            `).join('');
+            
+            return `
+                <div class="generated-landing">
+                    <section class="hero-section">
+                        <h1 class="hero-title">${content.headline}</h1>
+                        <p class="hero-subtitle">${content.subtitle}</p>
+                        <img src="${landing.productImage}" alt="${landing.productName}" class="hero-image">
+                    </section>
+                    
+                    <section class="features-section">
+                        <div class="features-grid">
+                            ${features}
+                        </div>
+                    </section>
+                    
+                    <section class="cta-section">
+                        <h2>سعر خاص لفترة محدودة!</h2>
+                        <div class="price-tag">${content.price}</div>
+                        <p>بدلاً من <del style="color: #999;">${parseInt(content.price) * 1.5} ريال</del></p>
+                        
+                        <form class="order-form" onsubmit="submitOrder(event, '${landing.id}')">
+                            <input type="text" name="customerName" placeholder="الاسم الكامل" required>
+                            <input type="tel" name="phone" placeholder="رقم الهاتف" required>
+                            <input type="text" name="address" placeholder="العنوان / المدينة" required>
+                            <button type="submit" class="order-btn">
+                                <i class="fas fa-shopping-bag"></i> ${content.cta}
+                            </button>
+                        </form>
+                    </section>
+                </div>
+            `;
+        }
+
+        // Submit Order (from landing page)
+        function submitOrder(event, landingId) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const order = {
+                id: 'order_' + Date.now(),
+                landingId: landingId,
+                productName: landings.find(l => l.id === landingId)?.productName || 'منتج',
+                customerName: form.customerName.value,
+                phone: form.phone.value,
+                address: form.address.value,
+                status: 'new',
+                createdAt: new Date().toISOString()
+            };
+            
+            orders.unshift(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            // Show success message in modal
+            form.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: var(--success);">
+                    <i class="fas fa-check-circle" style="font-size: 4em; margin-bottom: 20px;"></i>
+                    <h3>تم إرسال طلبك بنجاح!</h3>
+                    <p>سنتواصل معك قريباً لتأكيد الطلب</p>
+                </div>
+            `;
+            
+            updateOrdersBadge();
+        }
+
+        // Load Landings
+        function loadLandings() {
+            const container = document.getElementById('landingsList');
+            const emptyState = document.getElementById('noLandings');
+            
+            if (landings.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            container.innerHTML = landings.map(l => `
+                <div class="landing-card">
+                    <img src="${l.productImage}" alt="${l.productName}" class="landing-card-image">
+                    <div class="landing-card-content">
+                        <h3 class="landing-card-title">${l.productName}</h3>
+                        <p class="landing-card-date">${new Date(l.createdAt).toLocaleDateString('ar-SA')}</p>
+                        <div class="landing-card-actions">
+                            <button class="btn-small btn-secondary" onclick="viewLanding('${l.id}')">
+                                <i class="fas fa-eye"></i> معاينة
+                            </button>
+                            <button class="btn-small" style="background: #dbeafe; color: #1e40af;" onclick="copyLandingLink('${l.id}')">
+                                <i class="fas fa-link"></i> نسخ الرابط
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // View Specific Landing
+        function viewLanding(id) {
+            const landing = landings.find(l => l.id === id);
+            if (landing) {
+                currentLanding = landing;
+                previewLanding();
+            }
+        }
+
+        // Copy Landing Link
+        function copyLandingLink(id) {
+            const landing = landings.find(l => l.id === id);
+            if (landing) {
+                const input = document.createElement('input');
+                input.value = landing.url;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                showToast('تم نسخ رابط الصفحة!');
+            }
+        }
+
+        // Load Orders
+        function loadOrders() {
+            const tbody = document.getElementById('ordersTableBody');
+            const noOrders = document.getElementById('noOrders');
+            const ordersList = document.getElementById('ordersList');
+            
+            // Update stats
+            document.getElementById('totalOrders').textContent = orders.length;
+            document.getElementById('newOrders').textContent = orders.filter(o => o.status === 'new').length;
+            document.getElementById('completedOrders').textContent = orders.filter(o => o.status === 'completed').length;
+            
+            if (orders.length === 0) {
+                ordersList.style.display = 'none';
+                noOrders.style.display = 'block';
+                return;
+            }
+            
+            ordersList.style.display = 'block';
+            noOrders.style.display = 'none';
+            
+            tbody.innerHTML = orders.map(o => `
+                <tr>
+                    <td><strong>${o.productName}</strong></td>
+                    <td>${o.customerName}</td>
+                    <td>${o.phone}</td>
+                    <td>${new Date(o.createdAt).toLocaleDateString('ar-SA')}</td>
+                    <td><span class="badge badge-${o.status}">${getStatusText(o.status)}</span></td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn view" onclick="viewOrder('${o.id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${o.status !== 'completed' ? `
+                            <button class="action-btn complete" onclick="completeOrder('${o.id}')">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            ` : '' : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Get Status Text
+        function getStatusText(status) {
+            const map = { new: 'جديد', contacted: 'تم التواصل', completed: 'مكتمل' };
+            return map[status] || status;
+        }
+
+        // View Order Details
+        function viewOrder(id) {
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+            
+            alert(`
+                تفاصيل الطلب:
+                
+                المنتج: ${order.productName}
+                العميل: ${order.customerName}
+                الهاتف: ${order.phone}
+                العنوان: ${order.address || 'غير متوفر'}
+                التاريخ: ${new Date(order.createdAt).toLocaleString('ar-SA')}
+                الحالة: ${getStatusText(order.status)}
+            `);
+        }
+
+        // Complete Order
+        function completeOrder(id) {
+            const order = orders.find(o => o.id === id);
+            if (order) {
+                order.status = 'completed';
+                localStorage.setItem('orders', JSON.stringify(orders));
+                loadOrders();
+                updateOrdersBadge();
+                showToast('تم تحديث حالة الطلب');
+            }
+        }
+
+        // Update Orders Badge
+        function updateOrdersBadge() {
+            const newCount = orders.filter(o => o.status === 'new').length;
+            const badge = document.getElementById('ordersBadge');
+            if (newCount > 0) {
+                badge.textContent = newCount;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Export Orders to CSV
+        function exportOrders() {
+            if (orders.length === 0) {
+                showToast('لا توجد طلبات للتصدير', 'error');
+                return;
+            }
+            
+            const csv = [
+                ['المنتج', 'العميل', 'الهاتف', 'العنوان', 'التاريخ', 'الحالة'],
+                ...orders.map(o => [
+                    o.productName,
+                    o.customerName,
+                    o.phone,
+                    o.address || '',
+                    new Date(o.createdAt).toLocaleString('ar-SA'),
+                    getStatusText(o.status)
+                ])
+            ].map(row => row.join(',')).join('\n');
+            
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'orders_' + new Date().toISOString().split('T')[0] + '.csv';
+            link.click();
+            
+            showToast('تم تصدير الطلبات بنجاح!');
+        }
+
+        // Reset Form
+        function resetForm() {
+            document.getElementById('landingForm').reset();
+            document.getElementById('previewImage').classList.remove('show');
+            document.getElementById('uploadArea').classList.remove('has-image');
+            uploadedImageBase64 = null;
+            currentLanding = null;
+            
+            document.getElementById('resultSection').classList.remove('show');
+            document.getElementById('landingForm').style.display = 'block';
+            
+            // Reset steps
+            document.querySelectorAll('.step').forEach(s => s.className = 'step');
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('previewModal').classList.remove('show');
+        }
+
+        // Close modal on outside click
+        document.getElementById('previewModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+        // Show Toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toastMessage');
+            
+            toast.className = 'toast show ' + type;
+            msg.textContent = message;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Check for landing page parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const landingId = urlParams.get('landing');
+        if (landingId) {
+            const landing = landings.find(l => l.id === landingId);
+            if (landing) {
+                // Show landing page directly
+                document.body.innerHTML = generateLandingHTML(landing);
+                document.title = landing.productName + ' - صفحة شراء';
+            }
+        }
+    </script>
+</body>
+</html>
